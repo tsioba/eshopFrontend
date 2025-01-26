@@ -77,62 +77,6 @@ const OrderForm = ({ totalAmount, onSuccess, onFailure }) => {
 		}
 	};
 
-	//======================================================================================
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
-	const handleOrder = async (e) => {
-		e.preventDefault(); // Αποτροπή του default form submit για να μη φορτώσει η σελίδα
-
-		setLoading(true);
-		setError(null);
-
-		const orderItems = Object.keys(cartItems).map(productId => {
-			const item = cartItems[productId];
-			return {
-				productId: parseInt(productId), // Ανάγνωση του productId ως ακέραιο
-				quantity: item.quantity
-			};
-		});
-
-		const orderData = {
-			fullname: order.fullname,
-			email: order.email,
-			phone: order.phone,
-			status: 'pending', // Ή όποια κατάσταση επιθυμείς
-			totalAmount: parseFloat(order.totalAmount.toFixed(2)),
-			orderItems: orderItems // Εδώ είναι η σωστή θέση για τα orderItems
-		};
-
-		try {
-			// Κλήση στο endpoint της Viva για να δημιουργήσεις την παραγγελία
-			const response = await axios.post('http://192.168.1.64:8080/viva/order', orderData, {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			if (response.status === 200) {
-				const data = response.data;
-
-				// Παίρνουμε το orderCode από την απάντηση
-				const orderCode = String(data.orderCode);
-
-				// Δημιουργούμε το URL για το VivaPayments και το κάνουμε redirect
-				const url = `https://demo.vivapayments.com/web/checkout?ref=${orderCode}`;
-
-
-				// Κάνουμε το redirect στην ίδια καρτέλα
-				window.location.href = url; // Το URL με το orderCode από το backend
-			} else {
-				throw new Error('Failed to create order');
-			}
-		} catch (err) {
-			setError('There was an error while processing your order');
-			console.error(err);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 
 
